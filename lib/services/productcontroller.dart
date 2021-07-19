@@ -14,7 +14,7 @@ class ProductsController extends GetxController {
     super.onReady();
     print("doin");
     products.bindStream(getAllProducts());
-    print(models);
+    print(products);
   }
 
   Stream<List<ProductsModel>> getAllProducts() =>
