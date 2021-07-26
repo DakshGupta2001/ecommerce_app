@@ -3,15 +3,37 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:cupertino_icons/cupertino_icons.dart';
+import 'package:flutter/services.dart';
+import 'package:flutter_application_1/models/total.dart';
 import 'package:flutter_application_1/services/authmanagement.dart';
+import 'package:fluttertoast/fluttertoast.dart';
 import 'package:get/get.dart';
 
 class DetailsScreen extends StatelessWidget {
   final DocumentSnapshot product;
   const DetailsScreen({required this.product});
+  //@override
+void initState(){
+  //super.initState();
+  SystemChrome.setPreferredOrientations([
+      DeviceOrientation.landscapeRight,
+      DeviceOrientation.landscapeLeft,
+  ]);
+}
+//@override
+dispose(){
+  SystemChrome.setPreferredOrientations([
+    DeviceOrientation.landscapeRight,
+    DeviceOrientation.landscapeLeft,
+    DeviceOrientation.portraitUp,
+    DeviceOrientation.portraitDown,
+  ]);
+  //super.dispose();
+}
   @override
   Widget build(BuildContext context) {
     FirebaseController controller = Get.find();
+    totalvaluecontroller valuecontroller = Get.find();
     return Scaffold(
       // each product have a color
       backgroundColor: Color(product['Colour']),
@@ -187,6 +209,22 @@ class DetailsScreen extends StatelessWidget {
                                     color: Color(
                                         product['Colour']),
                                     onPressed: () async {
+                                      Fluttertoast.showToast(
+                                          msg:
+                                              "Item Added To Cart",
+                                          toastLength: Toast
+                                              .LENGTH_SHORT,
+                                          gravity:
+                                              ToastGravity
+                                                  .TOP,
+                                          timeInSecForIosWeb:
+                                              1,
+                                          backgroundColor:
+                                              Colors.black54,
+                                          textColor:
+                                              Colors.white,
+                                          fontSize: 16.0);
+
                                       String custom_uid =
                                           controller
                                               .firebaseUser
@@ -199,12 +237,12 @@ class DetailsScreen extends StatelessWidget {
                                               .collection(
                                                   "User_Carts")
                                               .doc(
-                                                  custom_uid) //user id is gonna be id for documents 
+                                                  custom_uid) //user id is gonna be id for documents
                                               .get();
 
-                                      if (                    
-                                          !snapShot
-                                              .exists) {  //if document id exists add onto it else make a new one
+                                      if (!snapShot
+                                          .exists) {
+                                        //if document id exists add onto it else make a new one
 
                                         FirebaseFirestore
                                             .instance
@@ -214,8 +252,12 @@ class DetailsScreen extends StatelessWidget {
                                             .set({
                                           "Items": FieldValue
                                               .arrayUnion([
-                                            product["Id"]
-                                          ])
+                                            product["Id"].trim()
+                                          ]),
+                                          "Cart_value":
+                                              (product[
+                                                      "Price"]
+                                                  as int)
                                         });
                                       } else {
                                         FirebaseFirestore
@@ -226,8 +268,22 @@ class DetailsScreen extends StatelessWidget {
                                             .update({
                                           "Items": FieldValue
                                               .arrayUnion([
-                                            product["Id"]
+                                            product["Id"].trim()
                                           ])
+                                        });
+                                        int prev_cart_val =
+                                            snapShot.data()![
+                                                'Cart_value'];
+                                        FirebaseFirestore
+                                            .instance
+                                            .collection(
+                                                "User_Carts")
+                                            .doc(custom_uid)
+                                            .update({
+                                          "Cart_value": (product[
+                                                      'Price']
+                                                  as int) +
+                                              prev_cart_val
                                         });
                                       }
                                       /*

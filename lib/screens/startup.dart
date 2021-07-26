@@ -41,7 +41,7 @@ class Homepage extends StatelessWidget {
                       height: 20,
                     ),
                     Text(
-                      "We Provide the most comfortable shoes in the World! ",
+                      "We Provide the most beautiful bags in the World! ",
                       textAlign: TextAlign.center,
                       style: TextStyle(
                         color: Colors.grey[700],

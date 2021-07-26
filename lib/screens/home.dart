@@ -3,6 +3,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 
 import 'package:flutter/material.dart';
+import 'package:flutter_application_1/models/total.dart';
 import 'package:flutter_application_1/screens/cart.dart';
 import 'package:flutter_application_1/screens/contactus.dart';
 
@@ -10,6 +11,8 @@ import 'package:flutter_application_1/services/authmanagement.dart';
 import 'package:flutter_spinkit/flutter_spinkit.dart';
 
 import 'package:get/get.dart';
+import 'package:google_fonts/google_fonts.dart';
+import 'empty.dart';
 import 'item_page.dart';
 
 class Home extends GetWidget<FirebaseController> {
@@ -19,6 +22,7 @@ class Home extends GetWidget<FirebaseController> {
   @override
   Widget build(BuildContext context) {
     String? userid = getuserid();
+    Get.put(totalvaluecontroller());
     //Get.put(Controller());
     //printdetails();
     return MaterialApp(
@@ -72,10 +76,29 @@ class Home extends GetWidget<FirebaseController> {
         ),
         appBar: AppBar(
           backgroundColor: Colors.black87,
+          title:Text('Clutch Closet',style: TextStyle(fontSize: 20),),
+          centerTitle: true,
           actions: [
+           // Center(child:Text('Where Style meets Perfection')),
             IconButton(
-              onPressed: () {
-                Get.to(appcart());
+              onPressed: () async {
+                String custom_uid =
+                                          controller
+                                              .firebaseUser
+                                              .value!
+                                              .uid;
+                final snapShot = await FirebaseFirestore
+                    .instance
+                    .collection("User_Carts")
+                    .doc(
+                        custom_uid.trim()) //user id is gonna be id for documents
+                    .get();
+
+                if (snapShot.exists) {
+                  Get.to(appcart());
+                } else {
+                  Get.to(empty_page());
+                }
               },
               icon: Icon(Icons.shopping_bag_outlined),
             )
